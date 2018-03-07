@@ -1,0 +1,58 @@
+该项目适合初次学习angular，不知如何搭建一个完整的项目。
+目录说明：
+index.html:项目入口页面
+main.js:项目入口js
+css：{
+    common.css:公共样式
+    index.css：首页布局样式
+}
+js：{
+    controllers:ng控制器
+    plugins:项目中用到的基础插件
+}
+tpl：{
+    比较公用的组件(在主页面通过 data-ng-include="'tpl/***.html'" 引入)
+    header.html:页面的头部
+    sideBar：侧边栏部分
+    footer.html:页面脚步
+}
+views：{
+    视图部分
+    one：侧边栏一切换内容
+    two:侧边栏二切换内容
+    three：侧边栏三切换内容
+    four：侧边栏四切换内容
+}
+
+main.js部分代码说明
+ng-app: appModel 根模块 依赖ui.router oc.lazyLoad
+var appModel = angular.module('appModel',[
+    "ui.router",
+    "oc.lazyLoad"
+]);
+//路由功能 sideBar.html结合一起看 就会很清晰
+appModel.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+    // Redirect any unmatched url
+    $urlRouterProvider.otherwise("/index.html"); //路由不匹配时 全都展示index.html页面
+    $stateProvider
+    .state('onelist', {
+        url: "/onelist.html",
+        templateUrl: "views/one/list.html",            
+        data: {pageTitle: '侧边栏一'},
+        controller: "OneListController",
+        resolve: {
+            deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                return $ocLazyLoad.load({
+                    name: 'appModel',
+                    insertBefore: '#ng_load_plugins_before', // load the above css files before a LINK element with this ID. Dynamic CSS files must be loaded between core and theme css files
+                    files: [
+                        'js/controllers/OneListController.js',//通过ocLazyLoad这个插件，就能加载该页面所需的js、css文件等
+                    ] 
+                });
+            }]
+        }
+    })
+}]);
+
+
+
